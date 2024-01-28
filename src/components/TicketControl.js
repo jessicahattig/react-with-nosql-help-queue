@@ -3,68 +3,51 @@ import NewTicketForm from './NewTicketForm';
 import TicketList from './TicketList';
 import EditTicketForm from './EditTicketForm';
 import TicketDetail from './TicketDetail';
+import React, { useState } from 'react';
 
-class TicketControl extends React.Component {
+function TicketControl() {
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      formVisibleOnPage: false,
-      mainTicketList: [],
-      selectedTicket: null,
-      editing: false
-    };
-  }
+  const [formVisibleOnPage, setFormVisibleOnPage] = useState(false);
+  const [mainTicketList, setMainTicketList] = useState([]);
 
-  handleClick = () => {
+  const handleClick = () => {
     if (this.state.selectedTicket != null) {
+      setFormVisibleOnPage(false);  
       this.setState({
         formVisibleOnPage: false,
         selectedTicket: null,
-        editing: false
       });
     } else {
-      this.setState(prevState => ({
-        formVisibleOnPage: !prevState.formVisibleOnPage,
-      }));
+      setFormVisibleOnPage(!formVisibleOnPage);
     }
   }
 
-  handleDeletingTicket = (id) => {
-    const newMainTicketList = this.state.mainTicketList.filter(ticket => ticket.id !== id);
-    this.setState({
-      mainTicketList: newMainTicketList,
-      selectedTicket: null
-    });
+ const handleDeletingTicket = (id) => {
+    const newMainTicketList = mainTicketList.filter(ticket => ticket.id !== id);
+    setMainTicketList(newMainTicketList);
   }
 
-  handleEditClick = () => {
+  const handleEditClick = () => {
     this.setState({editing: true});
   }
 
-  handleEditingTicketInList = (ticketToEdit) => {
-    const editedMainTicketList = this.state.mainTicketList
+  const handleEditingTicketInList = (ticketToEdit) => {
+    const editedMainTicketList = mainTicketList
       .filter(ticket => ticket.id !== this.state.selectedTicket.id)
       .concat(ticketToEdit);
-    this.setState({
-      mainTicketList: editedMainTicketList,
-      editing: false,
-      selectedTicket: null
-    });
+    setMainTicketList(editedMainTicketList);
   }
 
-  handleAddingNewTicketToList = (newTicket) => {
-    const newMainTicketList = this.state.mainTicketList.concat(newTicket);
-    this.setState({mainTicketList: newMainTicketList});
-    this.setState({formVisibleOnPage: false});
+  const handleAddingNewTicketToList = (newTicket) => {
+    const newMainTicketList = mainTicketList.concat(newTicket);
+    setMainTicketList(newMainTicketList);
+    setFormVisibleOnPage(false)
   }
 
-  handleChangingSelectedTicket = (id) => {
+  const handleChangingSelectedTicket = (id) => {
     const selectedTicket = this.state.mainTicketList.filter(ticket => ticket.id === id)[0];
     this.setState({selectedTicket: selectedTicket});
   }
-
-  render(){
     let currentlyVisibleState = null;
     let buttonText = null; 
     if (this.state.editing ) {      
@@ -72,16 +55,19 @@ class TicketControl extends React.Component {
       buttonText = "Return to Ticket List";
     } else if (this.state.selectedTicket != null) {
       currentlyVisibleState = <TicketDetail 
-      ticket={this.state.selectedTicket} 
+      ticket={selectedTicket} 
       onClickingDelete={this.handleDeletingTicket}
       onClickingEdit = {this.handleEditClick} />
       buttonText = "Return to Ticket List";
-    } else if (this.state.formVisibleOnPage) {
+    } else if (formVisibleOnPage) {
       currentlyVisibleState = <NewTicketForm onNewTicketCreation={this.handleAddingNewTicketToList}/>;
       buttonText = "Return to Ticket List"; 
     } else {
-      currentlyVisibleState = <TicketList onTicketSelection={this.handleChangingSelectedTicket} ticketList={this.state.mainTicketList} />;
-      buttonText = "Add Ticket"; 
+      currentlyVisibleState = 
+      <TicketList 
+        onTicketSelection={this.handleChangingSelectedTicket} 
+        ticketList={mainTicketList} />;
+    buttonText = "Add Ticket";  
     }
     return (
       <React.Fragment>
@@ -90,8 +76,6 @@ class TicketControl extends React.Component {
       </React.Fragment>
     );
   }
-
-}
 
 export default TicketControl;
 
