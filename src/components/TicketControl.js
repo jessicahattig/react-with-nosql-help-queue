@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import db from './../firebase.js';
+import { db } from './../firebase.js'
 import { collection, addDoc, doc, updateDoc, onSnapshot, deleteDoc } from 'firebase/firestore'
 import NewTicketForm from './NewTicketForm';
 import TicketList from './TicketList';
